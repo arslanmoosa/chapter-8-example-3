@@ -15,4 +15,6 @@ set -u # or set -o nounset
 : "$CONTAINER_REGISTRY"
 : "$VERSION"
 
+az login
+az aks get-credentials --resource-group deakinuni --name amTask71 --overwrite-existing
 docker build -t $CONTAINER_REGISTRY/video-streaming:$VERSION --file ./Dockerfile-prod .

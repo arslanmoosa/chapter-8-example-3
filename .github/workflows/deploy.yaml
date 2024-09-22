@@ -1,23 +1,9 @@
-# 
-# GitHub Actions workflow.
-#
-# Automatically deploys the Node.js microservice to Kubernetes on push to any branch. 
-# For real use you might want to restrict this to the "prod" branch.
-#
-
 name: Deploy microservice
 
 on:
-  #
-  # Deploys the microservice on push to the main branch of this code repository.
-  #
   push: 
     branches:
       - main
-
-  #
-  # Allows deployment to be invoked manually through the GitHub Actions user interface.
-  #
   workflow_dispatch: 
 
 jobs:
@@ -29,37 +15,51 @@ jobs:
       VERSION: ${{ github.sha }}
       CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
       REGISTRY_UN: ${{ secrets.REGISTRY_UN }}
-      REGISTRY_PW: ${{ secrets.REGISTRY_PW  }}
+      REGISTRY_PW: ${{ secrets.REGISTRY_PW }}
 
     steps:
       
-      # Checks-out your repository under $GITHUB_WORKSPACE.
+      # Checkout the code
       - uses: actions/checkout@v3
 
       #
-      # Builds the Docker image.
+      # Build Docker image
       #
-      - name: Build
+      - name: Build Docker Image
         run: ./scripts/build-image.sh
 
       #
-      # Publishes the Docker image to the container registry.
+      # Push Docker image to Azure Container Registry
       #
-      - name: Publish
+      - name: Push Docker Image
         run: ./scripts/push-image.sh
 
       #
-      # Installs Kubectl and connects it to the cluster.
+      # Download the Kubeconfig artifact
       #
-      # https://github.com/marketplace/actions/kubernetes-cli-kubectl
+      - name: Download Kubeconfig Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kubeconfig
+
+      #
+      # Set the kubeconfig
+      #
+      - name: Set Kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          cp kubeconfig ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      #
+      # Install Kubectl and deploy to Kubernetes
       #
       - uses: tale/kubectl-action@v1
         with:
-          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
           kubectl-version: v1.24.2
       
       #
-      # Expands the configuration template and deploys the microservice.
+      # Deploy the microservice using Kubectl
       #
-      - name: Deploy
+      - name: Deploy Microservice
         run: ./scripts/deploy.sh
