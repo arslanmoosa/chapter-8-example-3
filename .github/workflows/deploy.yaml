@@ -35,22 +35,7 @@ jobs:
         run: ./scripts/push-image.sh
 
       #
-      # Download the Kubeconfig artifact
-      #
-      - name: Download Kubeconfig Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: kubeconfig
-
-      #
       # Set the kubeconfig
-      #
-      - name: Set Kubeconfig
-        run: |
-          mkdir -p ~/.kube
-          cp kubeconfig ~/.kube/config
-          chmod 600 ~/.kube/config
-
       #
       # Install Kubectl and deploy to Kubernetes
       #
