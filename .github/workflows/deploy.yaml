@@ -39,10 +39,10 @@ jobs:
       #
       # Install Kubectl and deploy to Kubernetes
       #
-      - uses: tale/kubectl-action@v1
+      - name: Install Kubectl
+        uses: azure/setup-kubectl@v1
         with:
-          kubectl-version: v1.24.2
-      
+            version: v1.24.2
       #
       # Deploy the microservice using Kubectl
       #
