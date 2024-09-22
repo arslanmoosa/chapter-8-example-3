@@ -18,3 +18,6 @@ set -u # or set -o nounset
 : "$VERSION"
 
 envsubst < ./scripts/kubernetes/deploy.yaml | kubectl apply -f -
+kubectl get pods
+kubectl get deployment
+kubectl get services
